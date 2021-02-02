@@ -31,19 +31,19 @@ As if this was a "paella" recipe, in the list below you may find the Python libr
 
 - Gensim. The core of the project. This open-source library built for Natural Language Processing and spetially for topic modelling suits perfectly to our needs. We will use an LDA (Latent Dirichlet allocation) approach for the topic modelling.
 
-- Other useful Python libraries: 
+Other useful Python libraries: 
 
--- Matplotlib. Love it or hate it but very powerful for creating eye-catching plots and graphs.
+- Matplotlib. Love it or hate it but very powerful for creating eye-catching plots and graphs.
 
--- Regular Expressions. Feel like a movie hacker using this library. With a little practise, you will create time saving processes to find/replace text strings in a huge amounts of documents. Perfect for data cleaning our lyric corpus of numbers, punctuation, gibberish and so on. VERY important for a proper work of the topic model.
+- Regular Expressions. Feel like a movie hacker using this library. With a little practise, you will create time saving processes to find/replace text strings in a huge amounts of documents. Perfect for data cleaning our lyric corpus of numbers, punctuation, gibberish and so on. VERY important for a proper work of the topic model.
 
--- Numpy. Meant for working with number arrays and perform calculations and statistical functions.
+- Numpy. Meant for working with number arrays and perform calculations and statistical functions.
 
--- Pandas. Perfect for managing huge data frames were our lyric words will be. 
+- Pandas. Perfect for managing huge data frames were our lyric words will be. 
 
--- Pickle. Used for locally save Python objects
+- Pickle. Used for locally save Python objects
 
--- Scipy. A library for scientific computing, used here to create a sparse matrix.
+- Scipy. A library for scientific computing, used here to create a sparse matrix.
 
 ### Gathering data
 
