@@ -4,7 +4,7 @@
 
 As in literature, the topics covered in song lyrics have evolved over time. One may think that it is easy to guess which are the most common but... Would that be correct? Let's find out!
 
-Keep on reading to discover this interesting analysis performed, thanks to a Natural Language Processing topic model, over around 3700 song lyrics from the 40's until now. We will see which these topics are,  how their popularity evolved as the world changed thorugh the decades and if any of them plumbered in a given time or suddenly appeared and skyrocketed from then (spiler alert: a lot of "fuck, "shit" and "money" possibly involved in the latter topic).
+Keep on reading to discover this interesting analysis performed, thanks to a Natural Language Processing topic model, over around 3700 song lyrics from the 40's until now. We will see which these topics are,  how their popularity evolved as the world changed through the decades and if any of them plumbered in a given time or suddenly appeared and skyrocketed from then (spoiler alert: a lot of "fuck, "shit" and "money" possibly involved in the latter topic).
 
 Let's walk together through the complete creation process of this project where the different tools and decisions made along the way will be explained and (hopefully) justified, which may help understand the code (available in my github repository). \ref{}
 
@@ -29,7 +29,7 @@ As if this was a "paella" recipe, in the list below you may find the Python libr
 
 - Sklearn. One of the most used open-source machine learning libraries in Python. Very powerful for data analysis, however in the current project we only will be using it for transforming the bundle of lyrics to a matrix form, filtering out undesired words.
 
-- Gensim. The core of the project. This open-source library built for Natural Language Processing and specially for topic modelling suits perfectly to our needs. We will use an LDA (Latent Dirichlet allocation) approach for the topic modelling.
+- Gensim. The core of the project. This open-source library built for Natural Language Processing and specially for topic modeling suits perfectly to our needs. We will use an LDA (Latent Dirichlet allocation) approach for the topic modeling.
 
 Other useful Python libraries: 
 
@@ -47,26 +47,39 @@ Other useful Python libraries:
 
 ### Gathering data
 
-It is "exactly" like 10000 year ago when people used to gather fruit from the wilderness to survive. In our case, the internet is our own wilderness, fruit becomes data and instead of avoiding death by filling our guts, we avoid boredom by pleasing our curiosity.
+It is "exactly" like 10000 years ago when people used to gather fruit from the wilderness to survive. In our case, the internet is our own wilderness, fruit becomes data and instead of avoiding death by filling our guts, we avoid boredom by pleasing our curiosity.
 
-The source of the songs selected for the study will be the year-end top single lists by Billboard, compiled in different wikipedia documents from 1946 until 2020. If the first one is visited, it can be seen that the links to the rest are nicely packed near the footer of the page. Great, the first step will be scraping the page and saving these links for the next step.
+The source of the songs selected for the study will be the year-end top single lists by Billboard, compiled in different Wikipedia documents from 1946 until 2020. If the first one is visited, it can be seen that the links to the rest are nicely packed near the footer of the page. Great, the first step will be scraping the page and saving these links for the next step.
 
-A database in MongoDB is initialized and from now on, all the info related to each lyric will be saved to the corresponding DB document. The links from the previous step are consecutively scrapped and, using beautiful soup, the title, artist name and year of each lyric is saved.
+Then, a database in MongoDB is initialized and from now on, all the info related to each lyric will be saved to the corresponding DB document. After that, the links from the previous step are consecutively scraped and, using beautiful soup, the title, artist name and year of each lyric is saved.
 
-Now that the songs are compiled, a developer account from the lyric site Genius is created, since we will be using its API to perform a query and search each song by its title and artist. As usual, the response of the API consists of a JSON file which contains the URL of the lyric page (if found in their databases). An additional checking is performed; the title and artist name of the API response are compared with the one of the original query to avoid incorrect mismatches. A Levenshtein distance algorithm will be employed for this purpose.
+Now that the songs are compiled, a developer account from the lyric site Genius is created, since we will be using its API to perform a query and search each song by its title and artist. As usual, the response of the API consists of a JSON file which contains the URL of the lyric page (if found in their databases). An additional checking is performed; the title and artist name of the API response are compared with the ones of the original query to avoid incorrect mismatches. A Levenshtein distance algorithm will be employed for this purpose.
 
-Finally, the lyric URLs are requested and the lyrics from them are added to our database corresponding document.
+Finally, the lyric URLs are requested and the lyrics from them are added to our database corresponding document. A quick overview of random lyrics from the database would be helpful to check if this step is correctly complete (also, meaningful information of how to perform the upcoming data cleaning is extracted).
 
-### Pre-processing
-- stopword list
-- min and max words in documents filtering
-- Final bag of words count
+### Pre-processing the lyrics
+
+From now on a Pandas DataFrame will be used for carrying the lyric collection info. So, the first step consists in creating a dataframe and populating it with the title, artist name, year and lyric of each song in our database. This file will be pickled as the processing continues.
+
+Then, using RegEX, the lyrics are cleaned from numbers, punctuation marks, unrecognizable symbols and so on. Concractions (am -> 'm, not-> n't, etc) are repled with their fully form. This is done in order not to delete any information before the NLP model decides if that's necessary. Thanks to the overview of random lyrics performed in the previous step, it was detected that indicators of the lyric structure, such as CHORUS, REPEAT, OUTRO, etc, always consisted in uppercase text. So, using RegEx *One More Time*, any word consisting in 3 or more uppercase letters is removed from the lyrics.
+
+Now,a function from Sklearn called CountVectorizer is used to generate a matrix of tokens from the complete lyric collection. This powerful tool also allows specifying some parameters that become handy to filter out very common words (stopwords) present in most of the lyrics and the opposite, very unusual words which won't define a consistent topic. This function will be executed twice. 
+
+The first one will be performed to obtain the words which are present in at least the 20% of the songs. The stopword list obtained is manually checked and merged to an english common stopword list. This mixed list will be used as an input parameter for the second round. 
+
+For this second round an additional parameter is used: the minimum appearing frequency of words, which is fixed to 10. Hence, only words present in more than 10 lyrics and that are not contained in the previously generated stopword list will be taken into account. 
+
+The parameters chosen for the beforementioned rounds produce a vocabulary size of around 3700 different words. This is an acceptable value that can work perfectly with the model that will be used in the upcoming section. Finally, to complete the pre-processing, the resulting DataFrame in matrix form of the tokenized lyrics (where each token represents a word that has passed the filters) is saved using the Pickle function.
+
 
 ### LDA model
+
+
+
 - number of topics
 - number of passes
 - labeling
 	
 ## Results
-Some examples of topic modelling
+Some examples of topic modeling
 	Evolution of topics in songs
