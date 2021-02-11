@@ -1,6 +1,8 @@
 # Lyric topic evolution
 
+---
 ## Introduction
+---
 
 As in literature, the topics covered in song lyrics have evolved over time. One may think that it is easy to guess which are the most common but... Would that be correct? Let's find out!
 
@@ -9,9 +11,9 @@ Keep on reading to discover this interesting analysis performed, thanks to a Nat
 Let's walk together through the complete creation process of this project where the different tools and decisions made along the way will be explained and (hopefully) justified, which may help understand the code (available in my github repository). \ref{}
 
 
-
+---
 ## Method
-
+---
 ### Tools
 
 FIRST: Python.
@@ -61,7 +63,7 @@ Finally, the lyric URLs are requested and the lyrics from them are added to our 
 
 From now on a Pandas DataFrame will be used for carrying the lyric collection info. So, the first step consists in creating a dataframe and populating it with the title, artist name, year and lyric of each song in our database. This file will be pickled as the processing continues.
 
-Then, using RegEX, the lyrics are cleaned from numbers, punctuation marks, unrecognizable symbols and so on. Concractions (am -> 'm, not-> n't, etc) are repled with their fully form. This is done in order not to delete any information before the NLP model decides if that's necessary. Thanks to the overview of random lyrics performed in the previous step, it was detected that indicators of the lyric structure, such as CHORUS, REPEAT, OUTRO, etc, always consisted in uppercase text. So, using RegEx *One More Time*, any word consisting in 3 or more uppercase letters is removed from the lyrics.
+Then, using RegEX, the lyrics are cleaned from numbers, punctuation marks, unrecognizable symbols and so on. Concractions (am -> 'm, not-> n't, etc) are repled with their fully form. This is done in order not to delete any information before the NLP model decides if that's necessary. Thanks to the overview of random lyrics performed in the previous step, it was detected that indicators of the lyric structure, such as CHORUS, [bridge], REPEAT, [outro], etc, always consisted in uppercase text or inside square brackets. So, using RegEx *One More Time*, any word consisting in 3 or more uppercase letters or inside square brackets are removed from the lyrics.
 
 Now,a function from Sklearn called CountVectorizer is used to generate a matrix of tokens from the complete lyric collection. This powerful tool also allows specifying some parameters that become handy to filter out very common words (stopwords) present in most of the lyrics and the opposite, very unusual words which won't define a consistent topic. This function will be executed twice. 
 
@@ -74,12 +76,30 @@ The parameters chosen for the beforementioned rounds produce a vocabulary size o
 
 ### LDA model
 
+First of all, the multi core function of this model was used, setting 4 workers to do the job, which reduced in half the computational time. The model also requires a dictionary (a vocabulary) with all the different words contained in our corpus and the corpus itself. From the preprocessing, the corpus is already in sparse matrix form, the correct form required by the LDA model.
 
+For the number of passes (the equivalent of epoques from Machine Learning) and number of topics, a more complex method for picking these values is proposed as future work. In this project, multiple combination of these parameters were executed, finally selecting 5 topics and 100 passes for the results assessment. 
 
-- number of topics
-- number of passes
-- labeling
-	
+These parameters showed consistency. Increasing the number of topics produced the words of the topics collections to be mixed and repeated between them, decreasing the exclusivity of the words belonging to a single topic. A similar behavior was found when increasing the number of passes. 
+
+The LDA model outputs a set of word lists that belong to a specific topic, however, labeling those topics remains as a manual task for the user. Nevertheless, after tuning the previous parameters, doing so becomes an easy task. Let's see some words of the topics modeled and which label was assigned to them.
+
+|Example words																								|Chosen topic label	|
+|-----------------------------------------------------------------------------------------------------------|------------------:|
+|light, fire, rain, life, sun, sky, world, beautiful, soul, fly, wind, place, lights, free, shine			|*World beauty*		|
+|feel, life, think, mind, hold, eyes, keep, better, nothing, stay, find, believe, alone, look, true			|*Feelings*			|
+|shit, nigga, bitch, fuck, money, hit, bad, real, ass, watch, boy, low, ride, damn, big						|*Urban*			|
+|man, girls, boy, home, mama, walk, young, work, boys, big, old, daddy, town, cool, pretty					|*People life*		|
+|dance, body, tonight, shake, stop, rock, move, party, music, everybody, turn, beat, play, hands, floor		|*Dancing*			|
+
+Once the model is fitted with the lyrics, it is straightforward to classify each song to a combination of topics depending on the words of its lyrics. Then, the values of the songs of each year are averaged, obtaining the topic popularity evolution across the years. 
+
+---
 ## Results
+---
+
+At last, let's see some results! First, it seems interesting to extract some songs and the topics spoken in them.  
+
+
 Some examples of topic modeling
 	Evolution of topics in songs
