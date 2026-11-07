@@ -1,5 +1,6 @@
 // How often each theme appears among the 100 models, and in each independent half.
 import { box, dur, hideTip, pct, showTip, themeColor } from "../ui.js";
+import { fmt, t, themeLabel } from "../i18n.js";
 const d3 = window.d3;
 
 export function supportChart(el, data) {
@@ -8,28 +9,32 @@ export function supportChart(el, data) {
   function render() {
     const { width, height } = box(el);
     const narrow = width < 560;
-    const m = { top: 46, right: narrow ? 12 : 90, bottom: 30, left: narrow ? 118 : 210 };
+    // narrow screens: each theme's name above its line instead of in a left column
+    const m = { top: 46, right: narrow ? 16 : 90, bottom: 30, left: narrow ? 12 : 210 };
     const w = width - m.left - m.right, h = Math.min(height - m.top - m.bottom, themes.length * 70);
     const svg = d3.select(el).selectAll("svg").data([0]).join("svg").attr("viewBox", `0 0 ${width} ${height}`);
     svg.selectAll("*").remove();
     svg.append("text").attr("class", "annotation annotation--strong").attr("x", m.left).attr("y", 18)
-      .text(mode === "all" ? "Share of the 100 models where the theme appears" : "…and in each half of the models");
+      .text(t(mode === "all" ? "sup.title.all" : "sup.title.halves"));
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
     const x = d3.scaleLinear().domain([0, 1]).range([0, w]);
-    const y = d3.scaleBand().domain(themes.map((t) => t.id)).range([0, h]).padding(0.45);
+    const y = d3.scaleBand().domain(themes.map((th) => th.id)).range([0, h]).padding(0.45);
     g.append("g").attr("class", "axis").attr("transform", `translate(0,${h})`)
-      .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(".0%")).tickSize(-h))
+      .call(d3.axisBottom(x).ticks(5).tickFormat(fmt(".0%")).tickSize(-h))
       .call((s) => { s.select(".domain").remove(); s.selectAll(".tick line").attr("stroke", "var(--grid)"); });
     // thresholds
-    const rules = mode === "all" ? [[0.3, "minimum 30%"]] : [[0.3, "30%"], [0.5, "core: 50% in both halves"]];
+    const rules = mode === "all" ? [[0.3, t("sup.rule.min", { p: pct(0.3) })]]
+      : [[0.3, pct(0.3)], [0.5, t(narrow ? "sup.rule.core.short" : "sup.rule.core", { p: pct(0.5) })]];
     for (const [v, lab] of rules) {
       g.append("line").attr("x1", x(v)).attr("x2", x(v)).attr("y1", -6).attr("y2", h).attr("stroke", "var(--ink-2)").attr("stroke-width", 1);
       g.append("text").attr("class", "annotation").attr("x", x(v) + 4).attr("y", -8).text(lab);
     }
     const row = g.selectAll("g.row").data(themes).join("g").attr("class", "row")
       .attr("transform", (d) => `translate(0,${y(d.id) + y.bandwidth() / 2})`);
-    row.append("text").attr("x", -12).attr("dy", "0.35em").attr("text-anchor", "end").attr("fill", "var(--ink)")
-      .style("font-size", narrow ? "11px" : "13px").text((d) => d.label);
+    row.append("text").attr("x", narrow ? 0 : -12).attr("y", narrow ? -12 : 0).attr("dy", "0.35em")
+      .attr("text-anchor", narrow ? "start" : "end").attr("fill", "var(--ink)")
+      .style("font-size", narrow ? "12px" : "13px").text((d) => themeLabel(d))
+      .call((s) => { if (narrow) s.attr("stroke", "var(--page)").attr("stroke-width", 4).attr("paint-order", "stroke"); });
     row.append("line").attr("x1", 0).attr("x2", 0).attr("stroke", (d, i) => themeColor(i)).attr("stroke-width", 2)
       .transition().duration(dur()).attr("x2", (d) => x(mode === "all" ? d.support : Math.max(d.support_half1, d.support_half2)));
     if (mode === "all") {
@@ -45,16 +50,16 @@ export function supportChart(el, data) {
       }
       if (!narrow) {
         row.append("text").attr("class", "tier-label annotation annotation--strong").attr("x", w + 10).attr("dy", "0.35em")
-          .text((d) => d.tier);
+          .text((d) => t(`tier.${d.tier}`));
       }
     }
     row.append("rect").attr("x", -m.left).attr("y", -y.bandwidth()).attr("width", w + m.left).attr("height", y.bandwidth() * 2)
       .attr("fill", "transparent")
-      .on("pointermove", (ev, d) => showTip(ev, d.label, [
-        { label: "of all 100 models", value: pct(d.support) },
-        { label: "of the first half", value: pct(d.support_half1) },
-        { label: "of the second half", value: pct(d.support_half2) },
-        { label: "tier", value: d.tier }]))
+      .on("pointermove", (ev, d) => showTip(ev, themeLabel(d), [
+        { label: t("sup.tip.all"), value: pct(d.support) },
+        { label: t("sup.tip.h1"), value: pct(d.support_half1) },
+        { label: t("sup.tip.h2"), value: pct(d.support_half2) },
+        { label: t("sup.tip.tier"), value: t(`tier.${d.tier}`) }]))
       .on("pointerleave", hideTip);
   }
   return { render, update(step) { mode = step; render(); } };

@@ -1,5 +1,6 @@
 // Small multiples: share of each year's hits that use a very common word.
 import { hideTip, pct, showTip } from "../ui.js";
+import { fmt, t } from "../i18n.js";
 const d3 = window.d3;
 
 export function commonChart(el, data) {
@@ -15,7 +16,7 @@ export function commonChart(el, data) {
       const last = d3.mean(s.filter((d) => d[0] >= 2016), (d) => d[1]);
       const sub = document.createElement("p");
       sub.className = "sm-panel__sub";
-      sub.textContent = `${pct(first)} of hits (1946–59) → ${pct(last)} (2016–25)`;
+      sub.textContent = t("common.sub", { a: pct(first), b: pct(last) });
       const box = document.createElement("div");
       box.className = "sm-panel";
       panel.append(title, sub, box);
@@ -27,7 +28,7 @@ export function commonChart(el, data) {
       const y = d3.scaleLinear().domain([0, 1]).range([h, 0]);
       const svg = d3.select(box).append("svg").attr("viewBox", `0 0 ${width} ${height}`);
       const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
-      g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(2).tickSize(-w).tickFormat(d3.format(".0%")))
+      g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(2).tickSize(-w).tickFormat(fmt(".0%")))
         .call((a) => { a.select(".domain").remove(); a.selectAll(".tick line").attr("stroke", "var(--grid)"); });
       g.append("g").attr("class", "axis").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).tickValues([1950, 1980, 2010]).tickFormat(d3.format("d")).tickSizeOuter(0))
@@ -43,8 +44,8 @@ export function commonChart(el, data) {
           const d = s.find((r) => r[0] === yr);
           if (!d) return;
           cross.attr("x1", x(yr)).attr("x2", x(yr)).attr("opacity", 1);
-          showTip(ev, `${word}, ${yr}`, [{ label: "of the year's hits", value: pct(d[1]) },
-            { label: "95% interval", value: `${pct(d[2])}–${pct(d[3])}` }]);
+          showTip(ev, `${word}, ${yr}`, [{ label: t("common.tip"), value: pct(d[1]) },
+            { label: t("tip.ci"), value: `${pct(d[2])}–${pct(d[3])}` }]);
         })
         .on("pointerleave", () => { cross.attr("opacity", 0); hideTip(); });
     }

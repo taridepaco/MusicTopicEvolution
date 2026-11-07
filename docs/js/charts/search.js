@@ -1,5 +1,6 @@
 // "Look up a song": an accessible combobox over the 6,826 hits and their theme mix.
 import { inkOn, legend, themeColor } from "../ui.js";
+import { onLang, pct, t, themeLabel } from "../i18n.js";
 
 const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
@@ -9,7 +10,8 @@ export function songSearch(root, songsData, themes) {
   const result = document.getElementById("search-result");
   const [TITLE, ARTIST, YEARS, RANK, STATUS, WEIGHTS] = [0, 1, 2, 3, 4, 5];
   const songs = songsData.songs.map((r) => ({ r, key: norm(`${r[TITLE]} ${r[ARTIST]}`), title: norm(r[TITLE]) }));
-  const labelOf = new Map(themes.map((t, i) => [t.id, [t.label, i]]));
+  const labelOf = new Map(themes.map((th, i) => [th.id, [th, i]]));
+  const name = (id) => themeLabel(labelOf.get(id)[0]);
   let matches = [], active = -1;
 
   function search(q) {
@@ -31,12 +33,12 @@ export function songSearch(root, songsData, themes) {
       li.id = `song-opt-${i}`;
       li.setAttribute("role", "option");
       li.setAttribute("aria-selected", "false");
-      const t = document.createElement("div");
-      t.textContent = s.r[TITLE];
+      const ttl = document.createElement("div");
+      ttl.textContent = s.r[TITLE];
       const meta = document.createElement("div");
       meta.className = "meta";
       meta.textContent = `${s.r[ARTIST]} · ${s.r[YEARS].join(", ")}`;
-      li.append(t, meta);
+      li.append(ttl, meta);
       li.addEventListener("mousedown", (e) => { e.preventDefault(); choose(i); });
       list.appendChild(li);
     });
@@ -70,11 +72,11 @@ export function songSearch(root, songsData, themes) {
     h.textContent = r[TITLE];
     const meta = document.createElement("p");
     meta.className = "meta";
-    meta.textContent = `${r[ARTIST]} · year-end chart ${r[YEARS].join(", ")} · best position #${r[RANK]}`;
+    meta.textContent = t("search.meta", { artist: r[ARTIST], years: r[YEARS].join(", "), rank: r[RANK] });
     card.append(h, meta);
     if (r[STATUS] !== "m") {
       const p = document.createElement("p");
-      p.textContent = `Not in the models: ${songsData.status[r[STATUS]]}.`;
+      p.textContent = t("search.notin", { reason: t(`status.${r[STATUS]}`) });
       card.appendChild(p);
     } else {
       const parts = songsData.themes.map((id, k) => ({ id, v: r[WEIGHTS][k] / 100 }))
@@ -83,16 +85,16 @@ export function songSearch(root, songsData, themes) {
       const bar = document.createElement("div");
       bar.className = "segbar";
       bar.setAttribute("role", "img");
-      bar.setAttribute("aria-label", parts.map((p) => `${labelOf.get(p.id)[0]} ${Math.round(p.v * 100)}%`).join(", ")
-        + `, no recurring theme ${Math.round(rest * 100)}%`);
+      bar.setAttribute("aria-label", parts.map((p) => `${name(p.id)} ${pct(p.v)}`).join(", ")
+        + `, ${t("search.rest")} ${pct(rest)}`);
       for (const p of parts) {
         const [, i] = labelOf.get(p.id);
         const seg = document.createElement("div");
         seg.style.flex = `${p.v} 1 0`;
         seg.style.background = themeColor(i);
         seg.style.color = inkOn(i);
-        if (p.v >= 0.09) seg.textContent = `${Math.round(p.v * 100)}%`;
-        seg.title = `${labelOf.get(p.id)[0]}: ${Math.round(p.v * 100)}%`;
+        if (p.v >= 0.09) seg.textContent = pct(p.v);
+        seg.title = `${name(p.id)}: ${pct(p.v)}`;
         bar.appendChild(seg);
       }
       if (rest > 0.01) {
@@ -100,15 +102,15 @@ export function songSearch(root, songsData, themes) {
         seg.style.flex = `${rest} 1 0`;
         seg.style.background = "var(--mark-faint)";
         seg.style.color = "var(--ink)";
-        if (rest >= 0.09) seg.textContent = `${Math.round(rest * 100)}%`;
+        if (rest >= 0.09) seg.textContent = pct(rest);
         bar.appendChild(seg);
       }
       const leg = document.createElement("div");
       leg.className = "legend";
       legend(leg, [...parts.map((p) => {
-        const [label, i] = labelOf.get(p.id);
-        return { label: `${label} ${Math.round(p.v * 100)}%`, color: themeColor(i) };
-      }), ...(rest > 0.01 ? [{ label: `no recurring theme ${Math.round(rest * 100)}%`, color: "var(--mark-faint)" }] : [])]);
+        const [, i] = labelOf.get(p.id);
+        return { label: `${name(p.id)} ${pct(p.v)}`, color: themeColor(i) };
+      }), ...(rest > 0.01 ? [{ label: `${t("search.rest")} ${pct(rest)}`, color: "var(--mark-faint)" }] : [])]);
       card.append(bar, leg);
     }
     result.replaceChildren(card);
@@ -123,5 +125,6 @@ export function songSearch(root, songsData, themes) {
     else if (e.key === "Escape") close();
   });
   input.addEventListener("blur", () => setTimeout(close, 100));
+  onLang(() => { if (current) show(current.r); });
   return { show, search };
 }

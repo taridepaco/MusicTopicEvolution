@@ -1,5 +1,6 @@
 // Stacked area of the six themes by year, with crosshair tooltip and direct labels.
 import { box, dur, hideTip, pct, showTip, themeColor, xAxis, yGrid } from "../ui.js";
+import { themeLabel } from "../i18n.js";
 const d3 = window.d3;
 
 export function heroChart(el, data) {
@@ -7,10 +8,10 @@ export function heroChart(el, data) {
   const years = themes[0].series.map((d) => d[0]);
   const rows = years.map((y, i) => {
     const r = { year: y };
-    themes.forEach((t) => { r[t.id] = t.series[i][1]; });
+    themes.forEach((th) => { r[th.id] = th.series[i][1]; });
     return r;
   });
-  const keys = themes.map((t) => t.id);
+  const keys = themes.map((th) => th.id);
   const stack = d3.stack().keys(keys)(rows);
   let drawn = false;
 
@@ -53,7 +54,7 @@ export function heroChart(el, data) {
         .call((s) => {
           s.append("rect").attr("width", 10).attr("height", 10).attr("y", -5).attr("rx", 2)
             .attr("fill", (d) => themeColor(d.i));
-          s.append("text").attr("x", 15).attr("dy", "0.35em").text((d) => themes[d.i].label);
+          s.append("text").attr("x", 15).attr("dy", "0.35em").text((d) => themeLabel(themes[d.i]));
         });
     }
 
@@ -67,7 +68,7 @@ export function heroChart(el, data) {
         const r = rows.find((d) => d.year === yr);
         if (!r) return;
         cross.attr("x1", x(yr)).attr("x2", x(yr)).attr("opacity", 1);
-        showTip(ev, String(yr), themes.map((t, i) => ({ color: themeColor(i), label: t.label, value: pct(r[t.id]) })).reverse());
+        showTip(ev, String(yr), themes.map((th, i) => ({ color: themeColor(i), label: themeLabel(th), value: pct(r[th.id]) })).reverse());
       })
       .on("pointerleave", () => { cross.attr("opacity", 0); hideTip(); });
   }

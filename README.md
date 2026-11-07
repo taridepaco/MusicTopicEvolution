@@ -4,6 +4,7 @@ An interactive, scroll-driven article on how the themes of the most popular song
 changed between 1946 and 2025.
 
 **Read it here: https://taridepaco.github.io/MusicTopicEvolution/**
+(en español: https://taridepaco.github.io/MusicTopicEvolution/?lang=es)
 
 The article covers about 7,200 entries from the Billboard year-end charts. It uses lyrics for
 99% of them, after an audit of the lyric matches.
@@ -13,7 +14,7 @@ across models and random seeds are reported. A second method, BERTopic with sent
 checks the trends.
 
 The site also has the characteristic words of each decade and a search box that shows the theme
-mix of any hit.
+mix of any hit. It is available in English and Spanish, with a switch at the top of the page.
 
 The site contains aggregate results only: theme weights, word lists, titles and artists. It never
 contains lyrics.
