@@ -1,250 +1,241 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Song topic Evolution</title>
-    <!-- GOOGLE FONT -->
-    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet" />
-    <!-- BOOTSTRAP 4 -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
-      integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <!-- SCROOLL REVEAL JS LIBRARY CDN -->
-    <script src="https://unpkg.com/scrollreveal/dist/scrollreveal.min.js"></script>
-    <!-- CUSTOM CSS -->
-    <link rel="stylesheet" href="css/main.css">
-    <!-- FAVICON -->
-    <link rel="icon" type="image/png" href="img/favicon.png"/>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What were the hits about?</title>
+  <meta name="description" content="How the themes of the most popular songs in the US changed from 1946 to 2025, and why it took 100 topic models to find them.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="masthead__brand" href="https://github.com/taridepaco">@taridepaco</a>
+    <button class="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"/></svg>
+    </button>
+  </header>
 
-  </head>
-  
-  <body>
-    <section id="header">
-      <b class="transparent">h</b>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <a class="navbar-brand" href="#">@taridepaco</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-          aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+  <main>
+    <!-- ======================================================= intro -->
+    <section class="intro prose">
+      <p class="kicker">80 years of Billboard year-end hits</p>
+      <h1>What were the hits about?</h1>
+      <p class="dek">How the themes of America's most popular songs changed between 1946 and 2025, and why it took a hundred topic models to find them.</p>
+      <p class="byline">By <a href="https://github.com/taridepaco">@taridepaco</a> · November 2026</p>
+    </section>
+
+    <figure class="hero" aria-labelledby="hero-caption">
+      <div class="legend" id="hero-legend"></div>
+      <div class="chart chart--hero" id="hero-chart" role="img"
+           aria-label="Stacked area chart of six lyric themes from 1946 to 2025. Hip-hop swagger grows from about 3 percent to 20 percent after 1990; heartache is the largest theme and peaks in the 1980s; sky, sun and rain imagery halves."></div>
+      <figcaption id="hero-caption">Share of each year's hit lyrics that belongs to each of the six recurring themes found in the lyrics. The rest (18% on average) belongs to no recurring theme. <button class="link-button" type="button" data-table="hero">Show the data as a table</button></figcaption>
+      <div class="table-slot" id="hero-table" hidden></div>
+    </figure>
+
+    <section class="prose">
+      <p>Every December, <em>Billboard</em> publishes the year's biggest singles. Put those lists side by side since 1946 and you get a sample of what the United States chose to listen to, year after year: crooners and big bands, rock'n'roll, disco, power ballads, hip-hop, country.</p>
+      <p>What were all those songs about? I first tried to answer that in 2021 with a <em>topic model</em>, a statistical method that groups words that tend to appear together. It gave me five topics. Then I ran it again and got five different ones. This is the story of fixing that, and of what the lyrics say once the results stop moving.</p>
+    </section>
+
+    <!-- ======================================================= the songs -->
+    <section class="scrolly" data-chart="coverage">
+      <figure class="scrolly__figure">
+        <div class="chart" id="coverage-chart" role="img" aria-label="Chart of the hits analysed per decade"></div>
+      </figure>
+      <div class="scrolly__steps">
+        <div class="step" data-step="entries">
+          <p><strong>7,189 hits.</strong> Wikipedia keeps the year-end lists back to 1946: 30 to 50 songs a year at first, 100 a year since 1959. Some songs chart two years running, so there are 6,826 different songs.</p>
+        </div>
+        <div class="step" data-step="found">
+          <p>For <strong>99%</strong> of them I found lyrics in <a href="https://lrclib.net">LRCLIB</a>, an open lyrics database written by its users. Written by its users means mistakes: Dave Brubeck's <em>Take Five</em>, an instrumental, came with the words of <em>Hit the Road Jack</em>.</p>
+          <p>So I checked by hand the 330 matches that looked suspicious, and 100 random ones that didn't. The random ones had no errors, which puts the remaining error rate below 4%.</p>
+        </div>
+        <div class="step" data-step="shares">
+          <p>Two kinds of hit leave the analysis. <strong>Instrumentals</strong> were 8% of the 1950s hits and disappear after 2000. <strong>Lyrics in another language</strong>, mostly Spanish, are rare until the late 2010s and reach 5% in the 2020s.</p>
+          <p>What remains: <strong>6,618 songs</strong> with English lyrics.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= how -->
+    <section class="scrolly" data-chart="explainer">
+      <figure class="scrolly__figure">
+        <div class="explainer" id="explainer" aria-live="polite"></div>
+      </figure>
+      <div class="scrolly__steps">
+        <div class="step" data-step="lines">
+          <p>How does a computer read a song? Take an <strong>invented</strong> verse, four lines long.</p>
+        </div>
+        <div class="step" data-step="words">
+          <p>It drops the small words (<em>we, the, on, a</em>), reduces each word to its root (<em>drove → drive</em>) and ignores the order. It also leaves out words that a large share of all hits use, like <em>night</em> or <em>love</em>: they are everywhere, so they don't tell themes apart.</p>
+        </div>
+        <div class="step" data-step="topics">
+          <p>Looking at thousands of songs, the topic model learns which words travel together: <em>town</em> and <em>drive</em>, <em>dance</em> and <em>band</em>, <em>sky</em> and <em>rain</em>, <em>hurt</em> and <em>change</em>. Each group is a <strong>topic</strong>.</p>
+        </div>
+        <div class="step" data-step="mix">
+          <p>Every song gets a <strong>mix</strong> of topics. Average the mixes of all the hits of a year and you get the share of that year's lyrics that goes to each topic. That is what the chart at the top shows.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= instability -->
+    <section class="prose">
+      <h2>The topics that wouldn't sit still</h2>
+      <p>The model I used, LDA (Latent Dirichlet Allocation), starts from a random guess and improves it step by step. A different random start can end in a different answer. In 2021 I hadn't fixed that random start, and I had chosen the number of topics, five, by eye.</p>
+    </section>
+
+    <section class="scrolly" data-chart="runs">
+      <figure class="scrolly__figure">
+        <div class="chart" id="runs-chart" role="img" aria-label="Comparison of the topics of two runs of the same model"></div>
+      </figure>
+      <div class="scrolly__steps">
+        <div class="step" data-step="one">
+          <p>Here is one run with eight topics. Each row shows a topic's top words.</p>
+        </div>
+        <div class="step" data-step="two">
+          <p>And here is a second run: same songs, same settings, another random start. Each topic is paired with its closest twin; the number is how much their top-20 words agree (1 = identical).</p>
+          <p>Only the hip-hop topic is clearly the same. The rest of the vocabulary is carved up differently.</p>
+        </div>
+        <div class="step" data-step="grid">
+          <p>It is not bad luck. I fitted <strong>100 models</strong>: from 4 to 25 topics, ten random starts each. The more topics you ask for, the less two runs agree, and whatever the number, only one or two topics come back reliably from one random start to the next.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= ensemble -->
+    <section class="prose">
+      <h2>Asking a hundred models instead of one</h2>
+      <p>If no single run can be trusted, what can? The topics that keep coming back. The 100 models produced 1,120 topics in total. I grouped together the ones with similar top words and kept the groups that appear in at least 30% of the models.</p>
+    </section>
+
+    <section class="scrolly" data-chart="support">
+      <figure class="scrolly__figure">
+        <div class="chart" id="support-chart" role="img" aria-label="How often each of the six recurring themes appears among the models"></div>
+      </figure>
+      <div class="scrolly__steps">
+        <div class="step" data-step="all">
+          <p>Six groups pass that bar. I call them <strong>themes</strong>. Hip-hop language appears in every single model; heartache in 84% of them.</p>
+        </div>
+        <div class="step" data-step="halves">
+          <p>To check they aren't luck either, I split the random starts into two independent halves and repeated everything. <strong>All six themes appear in both halves.</strong></p>
+          <p>Three of them appear in at least half the models of <em>each</em> half: they are the <strong>core</strong> themes. The other three are fainter: real, but their exact borders depend on details, so read them with more caution.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= tour -->
+    <section class="prose">
+      <h2>Six themes, eighty years</h2>
+    </section>
+
+    <section class="scrolly" data-chart="tour">
+      <figure class="scrolly__figure">
+        <div class="legend legend--compact" id="tour-legend"></div>
+        <div class="chart" id="tour-chart" role="img" aria-label="Share of each theme by year"></div>
+      </figure>
+      <div class="scrolly__steps" id="tour-steps"><!-- one step per theme, built from data --></div>
+    </section>
+
+    <!-- ======================================================= bertopic -->
+    <section class="prose">
+      <h2>A second opinion</h2>
+      <p>A topic model only sees which words appear together. A completely different method, <strong>BERTopic</strong>, reads each lyric with a language model, places songs with similar meaning close together and groups them. If both methods tell the same story, it doesn't depend on the method.</p>
+    </section>
+
+    <section class="scrolly" data-chart="bertopic">
+      <figure class="scrolly__figure">
+        <div class="legend" id="bertopic-legend"></div>
+        <div class="chart" id="bertopic-chart" role="img" aria-label="Each theme compared with the closest group found by BERTopic, by decade"></div>
+      </figure>
+      <div class="scrolly__steps">
+        <div class="step" data-step="all">
+          <p>Each panel puts a theme next to the BERTopic group with the most similar words, decade by decade.</p>
+        </div>
+        <div class="step" data-step="agree">
+          <p>Two stories are confirmed by both methods: the <strong>rise of hip-hop language</strong> from the 1990s, and the <strong>decline of romantic, natural and heavenly imagery</strong> since the 1940s. Their curves follow each other almost exactly (correlations of 0.98 and 0.95).</p>
+        </div>
+        <div class="step" data-step="disagree">
+          <p>For towns and places the agreement is moderate. For heartache, dancing and the club the two methods don't agree: BERTopic, for example, sees sensual "body" songs growing inside its dance group. Those trends are better taken as hints.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= decades -->
+    <section class="prose">
+      <h2>The words of each decade</h2>
+      <p>Themes are broad. Single words are sharper. For each decade, these are the words whose use most differs from the rest of the 80 years, counting each word once per song, so that a chorus repeated forty times counts once.</p>
+    </section>
+
+    <section class="scrolly" data-chart="decades">
+      <figure class="scrolly__figure">
+        <div class="chart" id="decades-chart" role="img" aria-label="Most distinctive words of the selected decade"></div>
+      </figure>
+      <div class="scrolly__steps" id="decade-steps"><!-- built from data --></div>
+    </section>
+
+    <!-- ======================================================= common words -->
+    <section class="prose">
+      <h2>The words everybody uses</h2>
+      <p>The themes leave out the words used by more than one hit in eight, because they are too common to tell themes apart. But how often they appear changes too. <em>Love</em> was in about six hits out of ten until the 2000s and is in half of them in the 2020s. <em>Baby</em> went from one hit in ten to almost one in two. <em>Know</em> from four in ten to eight: lyrics talk more, and talk more directly to someone.</p>
+    </section>
+    <figure class="wide">
+      <div class="small-multiples" id="common-chart" role="img" aria-label="Share of each year's hits that use the words love, baby, heart, girl, know, feel and others"></div>
+      <figcaption>Share of each year's hits whose lyrics use the word at least once. Shaded: 95% confidence interval. <button class="link-button" type="button" data-table="common">Show the data as a table</button></figcaption>
+      <div class="table-slot" id="common-table" hidden></div>
+    </figure>
+
+    <!-- ======================================================= search -->
+    <section class="prose search-section">
+      <h2>Look up a song</h2>
+      <p>Type a title or an artist to see the mix of themes the models found in any of the 6,826 hits.</p>
+      <div class="search" id="search">
+        <label for="search-input" class="visually-hidden">Song title or artist</label>
+        <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+               placeholder="e.g. Bohemian Rhapsody, Dolly Parton…" role="combobox"
+               aria-expanded="false" aria-controls="search-list" aria-autocomplete="list">
+        <button type="button" id="search-random" class="search__random"
+                aria-label="Show a random song" data-tip="Show a random song">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><rect x="2.5" y="2.5" width="15" height="15" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6.6" cy="6.6" r="1.35" fill="currentColor"/><circle cx="13.4" cy="6.6" r="1.35" fill="currentColor"/><circle cx="10" cy="10" r="1.35" fill="currentColor"/><circle cx="6.6" cy="13.4" r="1.35" fill="currentColor"/><circle cx="13.4" cy="13.4" r="1.35" fill="currentColor"/></svg>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav ml-auto">
-            <a class="nav-item nav-link" href="../#header" >Return home </a>
-            <a class="nav-item nav-link" href="../#about" >About </a>
-            <a class="nav-item nav-link" href="../#projects" >Coding projects </a>
-            <a class="nav-item nav-link" href="../#contact" >Contact </a>
-            <a class="nav-item nav-link" href="https://github.com/taridepaco">My GitHub </a>
-          </div>
-        </div>
-      </nav>
-
-    <!-- SECTION -->
-    <!-- <section id="header"> -->
-      <div class="parallax-window" data-parallax="scroll" data-image-src="img/frontpic.jpg">
-        
-        <div class="container mt-0">
-          <div class="row">
-            <div class="col-md-12 mt-0">
-              <h1 class="transparent">h</h1>
-            </div>
-          </div>
-        </div>
-
-        <!-- <div class="container-fluid bg-light opacity-2 text-ocre header-name">Sudoker</div> -->
-
-        <div class="container-fluid header-name">
-          <div class="row">
-            <div class="col-md-12 col-sm-offset-5 text-center title-header" >
-              <h1 class="display-1 text-ocre"><strong>Song topic Evolution</strong></h1>
-            </div>
-          </div>
-        </div>
-
-          <div class="container-fluid header-name">
-            <div class="row">
-              <div class="col-md-12 mt-5 col-sm-offset-5 text-center">
-                <h1 class="display-6 text-ocre">
-                  <b>Project to study how the song topics have evolved along the decades</b>
-                </h1>
-                <h1 class="display-6 text-ocre">
-                  <b>---Work in progress---</b>
-                </h1>
-              </div>
-            </div>
-          </div>
-
+        <ul id="search-list" role="listbox" class="search__list" hidden></ul>
       </div>
-    </section>
-    
-    <section id=content>
-      
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-
-      <div class="intro">
-        <div class="container mt-3">
-          <div class="row">
-            <div class="col-md-12">
-              <hr style="height:4px;width:80%;color:rgb(27, 6, 148);background-color: rgb(27, 6, 148)">
-            </div>
-            
-            <p class="mt-2" align="justify" style="font-size: large; ">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero asperiores voluptatem minima incidunt vero nihil magnam voluptate, voluptatum doloremque aliquid mollitia impedit quas aspernatur sed dolore nisi magni perferendis soluta.
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero asperiores voluptatem minima incidunt vero nihil magnam voluptate, voluptatum doloremque aliquid mollitia impedit quas aspernatur sed dolore nisi magni perferendis soluta.
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero asperiores voluptatem minima incidunt vero nihil magnam voluptate, voluptatum doloremque aliquid mollitia impedit quas aspernatur sed dolore nisi magni perferendis soluta.
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero asperiores voluptatem minima incidunt vero nihil magnam voluptate, voluptatum doloremque aliquid mollitia impedit quas aspernatur sed dolore nisi magni perferendis soluta.
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="display-1 transparent">foo</h2>
-          </div>
-        </div>
-      </div>
+      <div class="search__result" id="search-result" aria-live="polite"></div>
     </section>
 
-    <footer id="contact">
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-12 mt-0">
-            <h2 class="transparent">foo</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container">
-        <div class="row mt-3">
-          <div class="col-md-12">
-            <hr style="height:4px;width:80%;border-width:0;color:rgb(150, 48, 90);background-color: rgb(150, 48, 90)">
-            <h1 class="mt-2 text_right">Contact</h1>
-          </div>
-        </div>
-      </div>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6"></div>
-          <div class="col-md-6">
-            <form class="card mt-4 align=right">
-              <div class="card-body">
-                <div class="form-group">
-                  <input type="text" class="form-control" placeholder="Name">
-                </div>
-                <div class="form-group">
-                  <input type="text" class="form-control" placeholder="Email">
-                </div>
-                <div class="form-group">
-                  <textarea cols="30" rows="10" placeholder="Message" class="form-control"></textarea>
-                </div>
-                <button class="btn btn-outline-secondary btn-block">
-                  Send
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <!-- ======================================================= method -->
+    <section class="prose method">
+      <h2>How this was made</h2>
+      <details>
+        <summary>Data, method and limits</summary>
+        <h3>Songs and lyrics</h3>
+        <p>Billboard year-end singles lists, 1946–2025, as compiled on Wikipedia (CC BY-SA): 7,189 entries and 6,826 songs. Lyrics from <a href="https://lrclib.net">LRCLIB</a>, an open, crowd-sourced database, with a few from lyrics.ovh. A match was accepted only when title and artist agreed; before 1965 a version by another artist was accepted for standards with an identical title.</p>
+        <p>Because the database is written by its users, the lyrics were audited by content: near-duplicate texts across different titles, non-Latin scripts, English share, very short texts and titles absent from their lyrics. The 330 flagged matches were checked by hand and 100 random unflagged ones as a control (no errors; 95% upper bound 3.7%). Instrumentals, lyrics in other languages and 25 songs with no correct text in any source are left out of the models: 6,618 songs remain.</p>
+        <h3>Themes</h3>
+        <p>Lyrics are cleaned (structure markers, repeated lines, contractions), lemmatised and filtered: a word must appear in at least 10 songs and in at most 12% of them. LDA models were fitted for 4 to 25 topics with 10 random seeds each (100 models), each run single-threaded with a fixed seed so that every result can be reproduced exactly. Topics from all models were grouped by the Jaccard similarity of their top-20 words (average-linkage clustering); groups present in at least 30% of the models are themes. A song's weight on a theme is averaged over the models that contain it. The whole procedure was repeated on two disjoint halves of the seeds: all themes reappear in both; core themes appear in at least 50% of the models of both halves.</p>
+        <p>The yearly share of a theme is the average weight of the theme over that year's chart entries, with a bootstrap 95% confidence interval (songs resampled within each year).</p>
+        <h3>Checks</h3>
+        <p>BERTopic: sentence embeddings of each lyric (all-mpnet-base-v2), UMAP and k-means with as many groups as themes, five seeds (agreement between seeds: adjusted Rand index 0.82). Each theme is paired with the BERTopic group with the most similar top words and their shares by decade are correlated. Distinctive words: weighted log-odds ratios with an informative Dirichlet prior (Monroe, Colaresi and Quinn, 2008), each decade against the rest, counting each word once per song.</p>
+        <h3>Limits</h3>
+        <ul>
+          <li>Year-end lists only: they favour songs that charted for a long time, and early years list 30–50 songs instead of 100.</li>
+          <li>Only English lyrics, and only what LRCLIB has: some versions may differ from the recording that charted.</li>
+          <li>Topic models treat a lyric as a bag of words: they see <em>rain</em>, not whether it is a metaphor.</li>
+          <li>Themes are measured in words: a theme's share is the share of a year's vocabulary that goes to it, not the share of songs "about" it.</li>
+        </ul>
+        <h3>Credits</h3>
+        <p>Charts: Wikipedia contributors (CC BY-SA). Lyrics: LRCLIB contributors. Built with Python (gensim, scikit-learn, BERTopic, sentence-transformers), D3 and Scrollama. No lyrics are published on this page: only words, titles and statistics.</p>
+      </details>
+    </section>
+  </main>
 
-   <!-- SCRIPTS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-  crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
-    integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
-    integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
-    crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-    crossorigin="anonymous"></script>
-  <script src="js/parallax.js"></script>
-  <!-- SCROOLL REVEAL SCRIPT -->
-  <script>
-    window.sr = ScrollReveal();
+  <footer class="footer prose">
+    <p>Made by <a href="https://github.com/taridepaco">@taridepaco</a>. 2021 idea, 2026 rebuild.</p>
+  </footer>
 
-    sr.reveal('.title-header', {
-      // delay: 1000,
-      duration: 1000,
-      origin: 'top',
-      distance: '300px',
-      mobile: false 
-    });
-
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        document.querySelector(this.getAttribute('hrefo')).scrollIntoView({
-          behavior: 'smooth'
-        });
-      });
-    });
-  </script>
-
-
-  </body>
+  <div class="tooltip" id="tooltip" role="status" hidden></div>
+  <script src="vendor/d3-7.9.0.min.js"></script>
+  <script src="vendor/scrollama-3.2.0.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
 </html>
