@@ -1,5 +1,6 @@
 // Loads the data, builds every chart and wires the scroll steps.
-import { legend, onRedraw, pct, table, tableToggle, themeColor } from "./ui.js";
+import { legend, onRedraw, pct, redrawNow, table, tableToggle, themeColor } from "./ui.js";
+import { initLang, onLang, t, themeLabel } from "./i18n.js";
 import { heroChart } from "./charts/hero.js";
 import { coverageChart } from "./charts/coverage.js";
 import { explainer } from "./charts/explainer.js";
@@ -62,22 +63,22 @@ function scrolly(section, chart) {
 }
 
 async function main() {
+  initLang();
   themeToggle();
   const [themes, stability, coverage, bert, decades, common, songs] = await Promise.all(
     ["themes", "stability", "coverage", "bertopic", "decade_words", "common_words", "songs"].map(load));
   const T = themes.themes;
 
   // hero
-  legend(document.getElementById("hero-legend"), T.map((t, i) => ({ label: t.label, color: themeColor(i) })));
+  const heroLegend = () => legend(document.getElementById("hero-legend"),
+    T.map((th, i) => ({ label: themeLabel(th), color: themeColor(i) })));
+  heroLegend();
   const hero = heroChart(document.getElementById("hero-chart"), themes);
   hero.render();
-  onRedraw(() => {
-    legend(document.getElementById("hero-legend"), T.map((t, i) => ({ label: t.label, color: themeColor(i) })));
-    hero.render();
-  });
+  onRedraw(() => { heroLegend(); hero.render(); });
   tableToggle(document.querySelector('[data-table="hero"]'), document.getElementById("hero-table"), (slot) =>
-    table(slot, ["Year", ...T.map((t) => t.label)],
-      T[0].series.map((d, k) => [String(d[0]), ...T.map((t) => pct(t.series[k][1], 1))])));
+    table(slot, [t("table.year"), ...T.map(themeLabel)],
+      T[0].series.map((d, k) => [String(d[0]), ...T.map((th) => pct(th.series[k][1], 1))])));
 
   // scrolly sections
   const sections = Object.fromEntries([...document.querySelectorAll(".scrolly")].map((s) => [s.dataset.chart, s]));
@@ -97,17 +98,19 @@ async function main() {
   cw.render();
   onRedraw(() => cw.render());
   tableToggle(document.querySelector('[data-table="common"]'), document.getElementById("common-table"), (slot) =>
-    table(slot, ["Year", ...common.words], common.series[common.words[0]].map((d, k) =>
+    table(slot, [t("table.year"), ...common.words], common.series[common.words[0]].map((d, k) =>
       [String(d[0]), ...common.words.map((w) => pct(common.series[w][k][1]))])));
 
   songSearch(document.getElementById("search"), songs, T);
+  onLang(redrawNow);                   // after the steps and tables have their new text
   document.documentElement.classList.add("is-ready");
 }
 
 main().catch((err) => {
   console.error(err);
+  document.documentElement.classList.remove("i18n-pending");
   const p = document.createElement("p");
   p.className = "prose";
-  p.textContent = "The charts could not be loaded. Please reload the page.";
+  p.textContent = t("error.load");
   document.querySelector("main").prepend(p);
 });

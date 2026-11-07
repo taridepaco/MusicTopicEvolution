@@ -59,6 +59,21 @@ h3 { font-size: 1.05rem; margin: 1.6em 0 0.3em; }
   border: 1px solid var(--grid); background: var(--surface); color: var(--ink-2);
   border-radius: 999px; width: 36px; height: 36px; font-size: 1rem; cursor: pointer;
 }
+.masthead__tools { display: flex; align-items: center; gap: 10px; }
+.lang-switch {
+  display: inline-flex; height: 36px; padding: 2px; gap: 2px;
+  border: 1px solid var(--grid); border-radius: 999px; background: var(--surface);
+}
+.lang-switch button {
+  border: 0; border-radius: 999px; padding: 0 11px; cursor: pointer;
+  background: transparent; color: var(--ink-2); font: inherit; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em;
+}
+.lang-switch button[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+@media (hover: hover) {
+  .lang-switch button[aria-pressed="false"]:hover { background: var(--grid); color: var(--ink); }
+}
+/* Spanish chosen before the first paint: keep the English text hidden until it is swapped (≤1.5 s) */
+.i18n-pending body { visibility: hidden; }
 
 .prose { max-width: var(--measure); margin: 0 auto; padding: 0 16px; }
 .intro { padding-top: 4vh; }

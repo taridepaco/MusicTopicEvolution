@@ -7,53 +7,77 @@
   <meta name="description" content="How the themes of the most popular songs in the US changed from 1946 to 2025, and why it took 100 topic models to find them.">
   <meta name="color-scheme" content="light dark">
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // pick the language before the first paint: ?lang=, then the last choice, then the browser
+    (function () {
+      var l = "en";
+      try {
+        var q = new URLSearchParams(location.search).get("lang"), s = null;
+        try { s = localStorage.getItem("ste-lang"); } catch (e) { /* storage unavailable */ }
+        var n = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+        l = q === "es" || q === "en" ? q : s === "es" || s === "en" ? s : /^es\b/i.test(n) ? "es" : "en";
+      } catch (e) { /* keep English */ }
+      document.documentElement.lang = l;
+      if (l !== "en") {
+        document.documentElement.classList.add("i18n-pending");
+        setTimeout(function () { document.documentElement.classList.remove("i18n-pending"); }, 1500);
+      }
+    })();
+  </script>
 </head>
 <body>
   <header class="masthead">
     <a class="masthead__brand" href="https://github.com/taridepaco">@taridepaco</a>
-    <button class="theme-toggle" type="button" aria-label="Switch between light and dark mode">
-      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"/></svg>
-    </button>
+    <div class="masthead__tools">
+      <div class="lang-switch" role="group" aria-label="Language / Idioma">
+        <button type="button" data-lang="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
+        <button type="button" data-lang="es" lang="es" aria-label="Español" aria-pressed="false">ES</button>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="Switch between light and dark mode"
+              data-i18n-attr="aria-label:a11y.theme">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 2a7 7 0 0 1 0 14z" fill="currentColor"/></svg>
+      </button>
+    </div>
   </header>
 
   <main>
     <!-- ======================================================= intro -->
     <section class="intro prose">
-      <p class="kicker">80 years of Billboard year-end hits</p>
-      <h1>What were the hits about?</h1>
-      <p class="dek">How the themes of America's most popular songs changed between 1946 and 2025, and why it took a hundred topic models to find them.</p>
-      <p class="byline">By <a href="https://github.com/taridepaco">@taridepaco</a> · November 2026</p>
+      <p class="kicker" data-i18n="intro.kicker">80 years of Billboard year-end hits</p>
+      <h1 data-i18n="intro.title">What were the hits about?</h1>
+      <p class="dek" data-i18n="intro.dek">How the themes of America's most popular songs changed between 1946 and 2025, and why it took a hundred topic models to find them.</p>
+      <p class="byline" data-i18n="intro.byline">By <a href="https://github.com/taridepaco">@taridepaco</a> · November 2026</p>
     </section>
 
     <figure class="hero" aria-labelledby="hero-caption">
       <div class="legend" id="hero-legend"></div>
       <div class="chart chart--hero" id="hero-chart" role="img"
-           aria-label="Stacked area chart of six lyric themes from 1946 to 2025. Hip-hop swagger grows from about 3 percent to 20 percent after 1990; heartache is the largest theme and peaks in the 1980s; sky, sun and rain imagery halves."></div>
-      <figcaption id="hero-caption">Share of each year's hit lyrics that belongs to each of the six recurring themes found in the lyrics. The rest (18% on average) belongs to no recurring theme. <button class="link-button" type="button" data-table="hero">Show the data as a table</button></figcaption>
+           data-i18n-attr="aria-label:hero.aria" aria-label="Stacked area chart of six lyric themes from 1946 to 2025. Hip-hop swagger grows from about 3 percent to 20 percent after 1990; heartache is the largest theme and peaks in the 1980s; sky, sun and rain imagery halves."></div>
+      <figcaption id="hero-caption"><span data-i18n="hero.caption">Share of each year's hit lyrics that belongs to each of the six recurring themes found in the lyrics. The rest (18% on average) belongs to no recurring theme.</span> <button class="link-button" type="button" data-table="hero">Show the data as a table</button></figcaption>
       <div class="table-slot" id="hero-table" hidden></div>
     </figure>
 
     <section class="prose">
-      <p>Every December, <em>Billboard</em> publishes the year's biggest singles. Put those lists side by side since 1946 and you get a sample of what the United States chose to listen to, year after year: crooners and big bands, rock'n'roll, disco, power ballads, hip-hop, country.</p>
-      <p>What were all those songs about? I first tried to answer that in 2021 with a <em>topic model</em>, a statistical method that groups words that tend to appear together. It gave me five topics. Then I ran it again and got five different ones. This is the story of fixing that, and of what the lyrics say once the results stop moving.</p>
+      <p data-i18n="intro.p1">Every December, <em>Billboard</em> publishes the year's biggest singles. Put those lists side by side since 1946 and you get a sample of what the United States chose to listen to, year after year: crooners and big bands, rock'n'roll, disco, power ballads, hip-hop, country.</p>
+      <p data-i18n="intro.p2">What were all those songs about? I first tried to answer that in 2021 with a <em>topic model</em>, a statistical method that groups words that tend to appear together. It gave me five topics. Then I ran it again and got five different ones. This is the story of fixing that, and of what the lyrics say once the results stop moving.</p>
     </section>
 
     <!-- ======================================================= the songs -->
     <section class="scrolly" data-chart="coverage">
       <figure class="scrolly__figure">
-        <div class="chart" id="coverage-chart" role="img" aria-label="Chart of the hits analysed per decade"></div>
+        <div class="chart" id="coverage-chart" role="img" data-i18n-attr="aria-label:cov.aria" aria-label="Chart of the hits analysed per decade"></div>
       </figure>
       <div class="scrolly__steps">
         <div class="step" data-step="entries">
-          <p><strong>7,189 hits.</strong> Wikipedia keeps the year-end lists back to 1946: 30 to 50 songs a year at first, 100 a year since 1959. Some songs chart two years running, so there are 6,826 different songs.</p>
+          <p data-i18n="cov.s1"><strong>7,189 hits.</strong> Wikipedia keeps the year-end lists back to 1946: 30 to 50 songs a year at first, 100 a year since 1959. Some songs chart two years running, so there are 6,826 different songs.</p>
         </div>
         <div class="step" data-step="found">
-          <p>For <strong>99%</strong> of them I found lyrics in <a href="https://lrclib.net">LRCLIB</a>, an open lyrics database written by its users. Written by its users means mistakes: Dave Brubeck's <em>Take Five</em>, an instrumental, came with the words of <em>Hit the Road Jack</em>.</p>
-          <p>So I checked by hand the 330 matches that looked suspicious, and 100 random ones that didn't. The random ones had no errors, which puts the remaining error rate below 4%.</p>
+          <p data-i18n="cov.s2a">For <strong>99%</strong> of them I found lyrics in <a href="https://lrclib.net">LRCLIB</a>, an open lyrics database written by its users. Written by its users means mistakes: Dave Brubeck's <em>Take Five</em>, an instrumental, came with the words of <em>Hit the Road Jack</em>.</p>
+          <p data-i18n="cov.s2b">So I checked by hand the 330 matches that looked suspicious, and 100 random ones that didn't. The random ones had no errors, which puts the remaining error rate below 4%.</p>
         </div>
         <div class="step" data-step="shares">
-          <p>Two kinds of hit leave the analysis. <strong>Instrumentals</strong> were 8% of the 1950s hits and disappear after 2000. <strong>Lyrics in another language</strong>, mostly Spanish, are rare until the late 2010s and reach 5% in the 2020s.</p>
-          <p>What remains: <strong>6,618 songs</strong> with English lyrics.</p>
+          <p data-i18n="cov.s3a">Two kinds of hit leave the analysis. <strong>Instrumentals</strong> were 8% of the 1950s hits and disappear after 2000. <strong>Lyrics in another language</strong>, mostly Spanish, are rare until the late 2010s and reach 5% in the 2020s.</p>
+          <p data-i18n="cov.s3b">What remains: <strong>6,618 songs</strong> with English lyrics.</p>
         </div>
       </div>
     </section>
@@ -65,137 +89,139 @@
       </figure>
       <div class="scrolly__steps">
         <div class="step" data-step="lines">
-          <p>How does a computer read a song? Take an <strong>invented</strong> verse, four lines long.</p>
+          <p data-i18n="exp.s1">How does a computer read a song? Take an <strong>invented</strong> verse, four lines long.</p>
         </div>
         <div class="step" data-step="words">
-          <p>It drops the small words (<em>we, the, on, a</em>), reduces each word to its root (<em>drove → drive</em>) and ignores the order. It also leaves out words that a large share of all hits use, like <em>night</em> or <em>love</em>: they are everywhere, so they don't tell themes apart.</p>
+          <p data-i18n="exp.s2">It drops the small words (<em>we, the, on, a</em>), reduces each word to its root (<em>drove → drive</em>) and ignores the order. It also leaves out words that a large share of all hits use, like <em>night</em> or <em>love</em>: they are everywhere, so they don't tell themes apart.</p>
         </div>
         <div class="step" data-step="topics">
-          <p>Looking at thousands of songs, the topic model learns which words travel together: <em>town</em> and <em>drive</em>, <em>dance</em> and <em>band</em>, <em>sky</em> and <em>rain</em>, <em>hurt</em> and <em>change</em>. Each group is a <strong>topic</strong>.</p>
+          <p data-i18n="exp.s3">Looking at thousands of songs, the topic model learns which words travel together: <em>town</em> and <em>drive</em>, <em>dance</em> and <em>band</em>, <em>sky</em> and <em>rain</em>, <em>hurt</em> and <em>change</em>. Each group is a <strong>topic</strong>.</p>
         </div>
         <div class="step" data-step="mix">
-          <p>Every song gets a <strong>mix</strong> of topics. Average the mixes of all the hits of a year and you get the share of that year's lyrics that goes to each topic. That is what the chart at the top shows.</p>
+          <p data-i18n="exp.s4">Every song gets a <strong>mix</strong> of topics. Average the mixes of all the hits of a year and you get the share of that year's lyrics that goes to each topic. That is what the chart at the top shows.</p>
         </div>
       </div>
     </section>
 
     <!-- ======================================================= instability -->
     <section class="prose">
-      <h2>The topics that wouldn't sit still</h2>
-      <p>The model I used, LDA (Latent Dirichlet Allocation), starts from a random guess and improves it step by step. A different random start can end in a different answer. In 2021 I hadn't fixed that random start, and I had chosen the number of topics, five, by eye.</p>
+      <h2 data-i18n="inst.h2">The topics that wouldn't sit still</h2>
+      <p data-i18n="inst.p">The model I used, LDA (Latent Dirichlet Allocation), starts from a random guess and improves it step by step. A different random start can end in a different answer. In 2021 I hadn't fixed that random start, and I had chosen the number of topics, five, by eye.</p>
     </section>
 
     <section class="scrolly" data-chart="runs">
       <figure class="scrolly__figure">
-        <div class="chart" id="runs-chart" role="img" aria-label="Comparison of the topics of two runs of the same model"></div>
+        <div class="chart" id="runs-chart" role="img" data-i18n-attr="aria-label:runs.aria" aria-label="Comparison of the topics of two runs of the same model"></div>
       </figure>
       <div class="scrolly__steps">
         <div class="step" data-step="one">
-          <p>Here is one run with eight topics. Each row shows a topic's top words.</p>
+          <p data-i18n="runs.s1">Here is one run with eight topics. Each row shows a topic's top words.</p>
         </div>
         <div class="step" data-step="two">
-          <p>And here is a second run: same songs, same settings, another random start. Each topic is paired with its closest twin; the number is how much their top-20 words agree (1 = identical).</p>
-          <p>Only the hip-hop topic is clearly the same. The rest of the vocabulary is carved up differently.</p>
+          <p data-i18n="runs.s2a">And here is a second run: same songs, same settings, another random start. Each topic is paired with its closest twin; the number is how much their top-20 words agree (1 = identical).</p>
+          <p data-i18n="runs.s2b">Only the hip-hop topic is clearly the same. The rest of the vocabulary is carved up differently.</p>
         </div>
         <div class="step" data-step="grid">
-          <p>It is not bad luck. I fitted <strong>100 models</strong>: from 4 to 25 topics, ten random starts each. The more topics you ask for, the less two runs agree, and whatever the number, only one or two topics come back reliably from one random start to the next.</p>
+          <p data-i18n="runs.s3">It is not bad luck. I fitted <strong>100 models</strong>: from 4 to 25 topics, ten random starts each. The more topics you ask for, the less two runs agree, and whatever the number, only one or two topics come back reliably from one random start to the next.</p>
         </div>
       </div>
     </section>
 
     <!-- ======================================================= ensemble -->
     <section class="prose">
-      <h2>Asking a hundred models instead of one</h2>
-      <p>If no single run can be trusted, what can? The topics that keep coming back. The 100 models produced 1,120 topics in total. I grouped together the ones with similar top words and kept the groups that appear in at least 30% of the models.</p>
+      <h2 data-i18n="ens.h2">Asking a hundred models instead of one</h2>
+      <p data-i18n="ens.p">If no single run can be trusted, what can? The topics that keep coming back. The 100 models produced 1,120 topics in total. I grouped together the ones with similar top words and kept the groups that appear in at least 30% of the models.</p>
     </section>
 
     <section class="scrolly" data-chart="support">
       <figure class="scrolly__figure">
-        <div class="chart" id="support-chart" role="img" aria-label="How often each of the six recurring themes appears among the models"></div>
+        <div class="chart" id="support-chart" role="img" data-i18n-attr="aria-label:sup.aria" aria-label="How often each of the six recurring themes appears among the models"></div>
       </figure>
       <div class="scrolly__steps">
         <div class="step" data-step="all">
-          <p>Six groups pass that bar. I call them <strong>themes</strong>. Hip-hop language appears in every single model; heartache in 84% of them.</p>
+          <p data-i18n="sup.s1">Six groups pass that bar. I call them <strong>themes</strong>. Hip-hop language appears in every single model; heartache in 84% of them.</p>
         </div>
         <div class="step" data-step="halves">
-          <p>To check they aren't luck either, I split the random starts into two independent halves and repeated everything. <strong>All six themes appear in both halves.</strong></p>
-          <p>Three of them appear in at least half the models of <em>each</em> half: they are the <strong>core</strong> themes. The other three are fainter: real, but their exact borders depend on details, so read them with more caution.</p>
+          <p data-i18n="sup.s2a">To check they aren't luck either, I split the random starts into two independent halves and repeated everything. <strong>All six themes appear in both halves.</strong></p>
+          <p data-i18n="sup.s2b">Three of them appear in at least half the models of <em>each</em> half: they are the <strong>core</strong> themes. The other three are fainter: real, but their exact borders depend on details, so read them with more caution.</p>
         </div>
       </div>
     </section>
 
     <!-- ======================================================= tour -->
     <section class="prose">
-      <h2>Six themes, eighty years</h2>
+      <h2 data-i18n="tour.h2">Six themes, eighty years</h2>
     </section>
 
     <section class="scrolly" data-chart="tour">
       <figure class="scrolly__figure">
         <div class="legend legend--compact" id="tour-legend"></div>
-        <div class="chart" id="tour-chart" role="img" aria-label="Share of each theme by year"></div>
+        <div class="chart" id="tour-chart" role="img" data-i18n-attr="aria-label:tour.aria" aria-label="Share of each theme by year"></div>
       </figure>
       <div class="scrolly__steps" id="tour-steps"><!-- one step per theme, built from data --></div>
     </section>
 
     <!-- ======================================================= bertopic -->
     <section class="prose">
-      <h2>A second opinion</h2>
-      <p>A topic model only sees which words appear together. A completely different method, <strong>BERTopic</strong>, reads each lyric with a language model, places songs with similar meaning close together and groups them. If both methods tell the same story, it doesn't depend on the method.</p>
+      <h2 data-i18n="bert.h2">A second opinion</h2>
+      <p data-i18n="bert.p">A topic model only sees which words appear together. A completely different method, <strong>BERTopic</strong>, reads each lyric with a language model, places songs with similar meaning close together and groups them. If both methods tell the same story, it doesn't depend on the method.</p>
     </section>
 
     <section class="scrolly" data-chart="bertopic">
       <figure class="scrolly__figure">
         <div class="legend" id="bertopic-legend"></div>
-        <div class="chart" id="bertopic-chart" role="img" aria-label="Each theme compared with the closest group found by BERTopic, by decade"></div>
+        <div class="chart" id="bertopic-chart" role="img" data-i18n-attr="aria-label:bert.aria" aria-label="Each theme compared with the closest group found by BERTopic, by decade"></div>
       </figure>
       <div class="scrolly__steps">
         <div class="step" data-step="all">
-          <p>Each panel puts a theme next to the BERTopic group with the most similar words, decade by decade.</p>
+          <p data-i18n="bert.s1">Each panel puts a theme next to the BERTopic group with the most similar words, decade by decade.</p>
         </div>
         <div class="step" data-step="agree">
-          <p>Two stories are confirmed by both methods: the <strong>rise of hip-hop language</strong> from the 1990s, and the <strong>decline of romantic, natural and heavenly imagery</strong> since the 1940s. Their curves follow each other almost exactly (correlations of 0.98 and 0.95).</p>
+          <p data-i18n="bert.s2">Two stories are confirmed by both methods: the <strong>rise of hip-hop language</strong> from the 1990s, and the <strong>decline of romantic, natural and heavenly imagery</strong> since the 1940s. Their curves follow each other almost exactly (correlations of 0.98 and 0.95).</p>
         </div>
         <div class="step" data-step="disagree">
-          <p>For towns and places the agreement is moderate. For heartache, dancing and the club the two methods don't agree: BERTopic, for example, sees sensual "body" songs growing inside its dance group. Those trends are better taken as hints.</p>
+          <p data-i18n="bert.s3">For towns and places the agreement is moderate. For heartache, dancing and the club the two methods don't agree: BERTopic, for example, sees sensual "body" songs growing inside its dance group. Those trends are better taken as hints.</p>
         </div>
       </div>
     </section>
 
     <!-- ======================================================= decades -->
     <section class="prose">
-      <h2>The words of each decade</h2>
-      <p>Themes are broad. Single words are sharper. For each decade, these are the words whose use most differs from the rest of the 80 years, counting each word once per song, so that a chorus repeated forty times counts once.</p>
+      <h2 data-i18n="dec.h2">The words of each decade</h2>
+      <p data-i18n="dec.p">Themes are broad. Single words are sharper. For each decade, these are the words whose use most differs from the rest of the 80 years, counting each word once per song, so that a chorus repeated forty times counts once.</p>
     </section>
 
     <section class="scrolly" data-chart="decades">
       <figure class="scrolly__figure">
-        <div class="chart" id="decades-chart" role="img" aria-label="Most distinctive words of the selected decade"></div>
+        <div class="chart" id="decades-chart" role="img" data-i18n-attr="aria-label:dec.aria" aria-label="Most distinctive words of the selected decade"></div>
       </figure>
       <div class="scrolly__steps" id="decade-steps"><!-- built from data --></div>
     </section>
 
     <!-- ======================================================= common words -->
     <section class="prose">
-      <h2>The words everybody uses</h2>
-      <p>The themes leave out the words used by more than one hit in eight, because they are too common to tell themes apart. But how often they appear changes too. <em>Love</em> was in about six hits out of ten until the 2000s and is in half of them in the 2020s. <em>Baby</em> went from one hit in ten to almost one in two. <em>Know</em> from four in ten to eight: lyrics talk more, and talk more directly to someone.</p>
+      <h2 data-i18n="common.h2">The words everybody uses</h2>
+      <p data-i18n="common.p">The themes leave out the words used by more than one hit in eight, because they are too common to tell themes apart. But how often they appear changes too. <em>Love</em> was in about six hits out of ten until the 2000s and is in half of them in the 2020s. <em>Baby</em> went from one hit in ten to almost one in two. <em>Know</em> from four in ten to eight: lyrics talk more, and talk more directly to someone.</p>
     </section>
     <figure class="wide">
-      <div class="small-multiples" id="common-chart" role="img" aria-label="Share of each year's hits that use the words love, baby, heart, girl, know, feel and others"></div>
-      <figcaption>Share of each year's hits whose lyrics use the word at least once. Shaded: 95% confidence interval. <button class="link-button" type="button" data-table="common">Show the data as a table</button></figcaption>
+      <div class="small-multiples" id="common-chart" role="img" data-i18n-attr="aria-label:common.aria" aria-label="Share of each year's hits that use the words love, baby, heart, girl, know, feel and others"></div>
+      <figcaption><span data-i18n="common.caption">Share of each year's hits whose lyrics use the word at least once. Shaded: 95% confidence interval.</span> <button class="link-button" type="button" data-table="common">Show the data as a table</button></figcaption>
       <div class="table-slot" id="common-table" hidden></div>
     </figure>
 
     <!-- ======================================================= search -->
     <section class="prose search-section">
-      <h2>Look up a song</h2>
-      <p>Type a title or an artist to see the mix of themes the models found in any of the 6,826 hits.</p>
+      <h2 data-i18n="search.h2">Look up a song</h2>
+      <p data-i18n="search.p">Type a title or an artist to see the mix of themes the models found in any of the 6,826 hits.</p>
       <div class="search" id="search">
-        <label for="search-input" class="visually-hidden">Song title or artist</label>
+        <label for="search-input" class="visually-hidden" data-i18n="search.label">Song title or artist</label>
         <input id="search-input" type="search" autocomplete="off" spellcheck="false"
                placeholder="e.g. Bohemian Rhapsody, Dolly Parton…" role="combobox"
+               data-i18n-attr="placeholder:search.placeholder"
                aria-expanded="false" aria-controls="search-list" aria-autocomplete="list">
         <button type="button" id="search-random" class="search__random"
-                aria-label="Show a random song" data-tip="Show a random song">
+                aria-label="Show a random song" data-tip="Show a random song"
+                data-i18n-attr="aria-label:search.random;data-tip:search.random">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><rect x="2.5" y="2.5" width="15" height="15" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6.6" cy="6.6" r="1.35" fill="currentColor"/><circle cx="13.4" cy="6.6" r="1.35" fill="currentColor"/><circle cx="10" cy="10" r="1.35" fill="currentColor"/><circle cx="6.6" cy="13.4" r="1.35" fill="currentColor"/><circle cx="13.4" cy="13.4" r="1.35" fill="currentColor"/></svg>
         </button>
         <ul id="search-list" role="listbox" class="search__list" hidden></ul>
@@ -205,32 +231,32 @@
 
     <!-- ======================================================= method -->
     <section class="prose method">
-      <h2>How this was made</h2>
+      <h2 data-i18n="method.h2">How this was made</h2>
       <details>
-        <summary>Data, method and limits</summary>
-        <h3>Songs and lyrics</h3>
-        <p>Billboard year-end singles lists, 1946–2025, as compiled on Wikipedia (CC BY-SA): 7,189 entries and 6,826 songs. Lyrics from <a href="https://lrclib.net">LRCLIB</a>, an open, crowd-sourced database, with a few from lyrics.ovh. A match was accepted only when title and artist agreed; before 1965 a version by another artist was accepted for standards with an identical title.</p>
-        <p>Because the database is written by its users, the lyrics were audited by content: near-duplicate texts across different titles, non-Latin scripts, English share, very short texts and titles absent from their lyrics. The 330 flagged matches were checked by hand and 100 random unflagged ones as a control (no errors; 95% upper bound 3.7%). Instrumentals, lyrics in other languages and 25 songs with no correct text in any source are left out of the models: 6,618 songs remain.</p>
-        <h3>Themes</h3>
-        <p>Lyrics are cleaned (structure markers, repeated lines, contractions), lemmatised and filtered: a word must appear in at least 10 songs and in at most 12% of them. LDA models were fitted for 4 to 25 topics with 10 random seeds each (100 models), each run single-threaded with a fixed seed so that every result can be reproduced exactly. Topics from all models were grouped by the Jaccard similarity of their top-20 words (average-linkage clustering); groups present in at least 30% of the models are themes. A song's weight on a theme is averaged over the models that contain it. The whole procedure was repeated on two disjoint halves of the seeds: all themes reappear in both; core themes appear in at least 50% of the models of both halves.</p>
-        <p>The yearly share of a theme is the average weight of the theme over that year's chart entries, with a bootstrap 95% confidence interval (songs resampled within each year).</p>
-        <h3>Checks</h3>
-        <p>BERTopic: sentence embeddings of each lyric (all-mpnet-base-v2), UMAP and k-means with as many groups as themes, five seeds (agreement between seeds: adjusted Rand index 0.82). Each theme is paired with the BERTopic group with the most similar top words and their shares by decade are correlated. Distinctive words: weighted log-odds ratios with an informative Dirichlet prior (Monroe, Colaresi and Quinn, 2008), each decade against the rest, counting each word once per song.</p>
-        <h3>Limits</h3>
+        <summary data-i18n="method.summary">Data, method and limits</summary>
+        <h3 data-i18n="method.h3.songs">Songs and lyrics</h3>
+        <p data-i18n="method.p1">Billboard year-end singles lists, 1946–2025, as compiled on Wikipedia (CC BY-SA): 7,189 entries and 6,826 songs. Lyrics from <a href="https://lrclib.net">LRCLIB</a>, an open, crowd-sourced database, with a few from lyrics.ovh. A match was accepted only when title and artist agreed; before 1965 a version by another artist was accepted for standards with an identical title.</p>
+        <p data-i18n="method.p2">Because the database is written by its users, the lyrics were audited by content: near-duplicate texts across different titles, non-Latin scripts, English share, very short texts and titles absent from their lyrics. The 330 flagged matches were checked by hand and 100 random unflagged ones as a control (no errors; 95% upper bound 3.7%). Instrumentals, lyrics in other languages and 25 songs with no correct text in any source are left out of the models: 6,618 songs remain.</p>
+        <h3 data-i18n="method.h3.themes">Themes</h3>
+        <p data-i18n="method.p3">Lyrics are cleaned (structure markers, repeated lines, contractions), lemmatised and filtered: a word must appear in at least 10 songs and in at most 12% of them. LDA models were fitted for 4 to 25 topics with 10 random seeds each (100 models), each run single-threaded with a fixed seed so that every result can be reproduced exactly. Topics from all models were grouped by the Jaccard similarity of their top-20 words (average-linkage clustering); groups present in at least 30% of the models are themes. A song's weight on a theme is averaged over the models that contain it. The whole procedure was repeated on two disjoint halves of the seeds: all themes reappear in both; core themes appear in at least 50% of the models of both halves.</p>
+        <p data-i18n="method.p4">The yearly share of a theme is the average weight of the theme over that year's chart entries, with a bootstrap 95% confidence interval (songs resampled within each year).</p>
+        <h3 data-i18n="method.h3.checks">Checks</h3>
+        <p data-i18n="method.p5">BERTopic: sentence embeddings of each lyric (all-mpnet-base-v2), UMAP and k-means with as many groups as themes, five seeds (agreement between seeds: adjusted Rand index 0.82). Each theme is paired with the BERTopic group with the most similar top words and their shares by decade are correlated. Distinctive words: weighted log-odds ratios with an informative Dirichlet prior (Monroe, Colaresi and Quinn, 2008), each decade against the rest, counting each word once per song.</p>
+        <h3 data-i18n="method.h3.limits">Limits</h3>
         <ul>
-          <li>Year-end lists only: they favour songs that charted for a long time, and early years list 30–50 songs instead of 100.</li>
-          <li>Only English lyrics, and only what LRCLIB has: some versions may differ from the recording that charted.</li>
-          <li>Topic models treat a lyric as a bag of words: they see <em>rain</em>, not whether it is a metaphor.</li>
-          <li>Themes are measured in words: a theme's share is the share of a year's vocabulary that goes to it, not the share of songs "about" it.</li>
+          <li data-i18n="method.li1">Year-end lists only: they favour songs that charted for a long time, and early years list 30–50 songs instead of 100.</li>
+          <li data-i18n="method.li2">Only English lyrics, and only what LRCLIB has: some versions may differ from the recording that charted.</li>
+          <li data-i18n="method.li3">Topic models treat a lyric as a bag of words: they see <em>rain</em>, not whether it is a metaphor.</li>
+          <li data-i18n="method.li4">Themes are measured in words: a theme's share is the share of a year's vocabulary that goes to it, not the share of songs "about" it.</li>
         </ul>
-        <h3>Credits</h3>
-        <p>Charts: Wikipedia contributors (CC BY-SA). Lyrics: LRCLIB contributors. Built with Python (gensim, scikit-learn, BERTopic, sentence-transformers), D3 and Scrollama. No lyrics are published on this page: only words, titles and statistics.</p>
+        <h3 data-i18n="method.h3.credits">Credits</h3>
+        <p data-i18n="method.p6">Charts: Wikipedia contributors (CC BY-SA). Lyrics: LRCLIB contributors. Built with Python (gensim, scikit-learn, BERTopic, sentence-transformers), D3 and Scrollama. No lyrics are published on this page: only words, titles and statistics.</p>
       </details>
     </section>
   </main>
 
   <footer class="footer prose">
-    <p>Made by <a href="https://github.com/taridepaco">@taridepaco</a>. 2021 idea, 2026 rebuild.</p>
+    <p data-i18n="footer">Made by <a href="https://github.com/taridepaco">@taridepaco</a>. 2021 idea, 2026 rebuild.</p>
   </footer>
 
   <div class="tooltip" id="tooltip" role="status" hidden></div>

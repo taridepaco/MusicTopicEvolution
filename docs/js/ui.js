@@ -1,4 +1,6 @@
 // Shared helpers: colours from CSS tokens, motion, tooltip, legend, tables, resize.
+import { onLang, pctAxis, t } from "./i18n.js";
+export { pct, pctAxis } from "./i18n.js";
 const d3 = window.d3;
 
 export const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -8,9 +10,6 @@ export const css = (name) => getComputedStyle(document.documentElement).getPrope
 export const themeColor = (i) => css(`--s${i + 1}`);
 // text inside a coloured fill: white, except near-black on the yellow slot (palette rule)
 export const inkOn = (i) => (i === 3 ? "#0b0b0b" : "#ffffff");
-
-export const pct = (v, digits = 0) => (v == null ? "–" : `${(v * 100).toFixed(digits)}%`);
-export const pctAxis = (v) => `${Math.round(v * 100)}%`;
 
 export function box(el) {
   const r = el.getBoundingClientRect();
@@ -91,12 +90,18 @@ export function table(el, columns, rows) {
 }
 
 export function tableToggle(button, slot, build) {
+  const label = () => { button.textContent = t(slot.hidden ? "table.show" : "table.hide"); };
   button.addEventListener("click", () => {
     const open = slot.hidden;
     if (open && !slot.firstChild) build(slot);
     slot.hidden = !open;
-    button.textContent = open ? "Hide the table" : "Show the data as a table";
+    label();
   });
+  onLang(() => {                       // rebuild in the new language (now if open, else on next open)
+    if (slot.hidden) slot.replaceChildren(); else build(slot);
+    label();
+  });
+  label();
 }
 
 /* ---------------------------------------------------------------- redraws */
@@ -104,6 +109,7 @@ const redraws = new Set();
 export function onRedraw(fn) { redraws.add(fn); }
 let timer;
 function redrawAll() { clearTimeout(timer); timer = setTimeout(() => redraws.forEach((f) => f()), 120); }
+export function redrawNow() { clearTimeout(timer); redraws.forEach((f) => f()); }
 window.addEventListener("resize", redrawAll);
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
 new MutationObserver(redrawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });

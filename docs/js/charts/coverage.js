@@ -1,5 +1,6 @@
 // The songs: entries per decade, then instrumentals and other-language lyrics per decade.
 import { box, dur, hideTip, pct, showTip, yGrid } from "../ui.js";
+import { cap, decade, decadeShort, num, pctAxis, t } from "../i18n.js";
 const d3 = window.d3;
 
 export function coverageChart(el, data) {
@@ -22,12 +23,12 @@ export function coverageChart(el, data) {
       .on("pointermove", (ev) => {
         const [px] = d3.pointer(ev);
         const d = rows[Math.max(0, Math.min(rows.length - 1, Math.floor(px / x.step())))];
-        showTip(ev, `${d.decade}s`, [
-          { label: "chart entries", value: d3.format(",")(d.entries) },
-          { label: "English lyrics", value: pct(d.english, 1) },
-          { label: "other language", value: pct(d.other_language, 1) },
-          { label: "instrumental", value: pct(d.instrumental, 1) },
-          { label: "no lyrics available", value: pct(d.unavailable, 1) }]);
+        showTip(ev, cap(decade(d.decade)), [
+          { label: t("cov.tip.entries"), value: num(d.entries) },
+          { label: t("cov.tip.english"), value: pct(d.english, 1) },
+          { label: t("cov.tip.other"), value: pct(d.other_language, 1) },
+          { label: t("cov.tip.instrumental"), value: pct(d.instrumental, 1) },
+          { label: t("cov.tip.unavailable"), value: pct(d.unavailable, 1) }]);
       })
       .on("pointerleave", hideTip);
   }
@@ -36,25 +37,29 @@ export function coverageChart(el, data) {
     const { width, height } = box(el);
     const svg = d3.select(el).selectAll("svg").data([0]).join("svg").attr("viewBox", `0 0 ${width} ${height}`);
     svg.selectAll("*").remove();
-    const label = (d) => `${String(d).slice(2)}s`;
+    // decade labels; every other one when they would touch (four-digit years in Spanish)
+    const label = (x) => {
+      const every = x.step() < decadeShort(rows[0].decade).length * 7 + 6 ? 2 : 1;
+      return (d, i) => (i % every ? "" : decadeShort(d));
+    };
     if (mode !== "shares") {
       const m = { top: 40, right: 10, bottom: 28, left: 44 };
       const w = width - m.left - m.right, h = height - m.top - m.bottom;
       const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
       const x = d3.scaleBand().domain(rows.map((d) => d.decade)).range([0, w]).padding(0.3);
       const y = d3.scaleLinear().domain([0, 1100]).range([h, 0]);
-      g.append("g").call((s) => yGrid(s, y, w, 4, d3.format(",")));
+      g.append("g").call((s) => yGrid(s, y, w, 4, num));
       g.append("g").attr("transform", `translate(0,${h})`).attr("class", "axis")
-        .call(d3.axisBottom(x).tickFormat(label).tickSizeOuter(0)).call((s) => s.select(".domain").attr("stroke", "var(--axis)"));
+        .call(d3.axisBottom(x).tickFormat(label(x)).tickSizeOuter(0)).call((s) => s.select(".domain").attr("stroke", "var(--axis)"));
       svg.append("text").attr("class", "annotation annotation--strong").attr("x", m.left).attr("y", 18)
-        .text(mode === "entries" ? "Year-end hits per decade" : "Hits with lyrics found, per decade");
+        .text(t(mode === "entries" ? "cov.title.entries" : "cov.title.found"));
       const value = mode === "entries" ? (d) => d.entries
         : (d) => Math.round(d.entries * (d.english + d.other_language));
-      columns(g, x, y, h, value, d3.format(","), null);
+      columns(g, x, y, h, value, num, null);
       return;
     }
     // two small multiples, one measure each (never two scales on one plot)
-    const panels = [["instrumental", "Instrumentals"], ["other_language", "Lyrics in another language"]];
+    const panels = [["instrumental", t("cov.panel.instrumental")], ["other_language", t("cov.panel.other")]];
     const stacked = width < 560;
     const pw = stacked ? width : (width - 24) / 2, ph = stacked ? (height - 10) / 2 : height;
     panels.forEach(([key, title], i) => {
@@ -62,13 +67,13 @@ export function coverageChart(el, data) {
       const m = { top: 40, right: 8, bottom: 26, left: 38 };
       const w = pw - m.left - m.right, h = ph - m.top - m.bottom;
       const p = svg.append("g").attr("transform", `translate(${ox},${oy})`);
-      p.append("text").attr("class", "annotation annotation--strong").attr("x", m.left).attr("y", 18).text(`${title} (share of hits)`);
+      p.append("text").attr("class", "annotation annotation--strong").attr("x", m.left).attr("y", 18).text(title);
       const g = p.append("g").attr("transform", `translate(${m.left},${m.top})`);
       const x = d3.scaleBand().domain(rows.map((d) => d.decade)).range([0, w]).padding(0.3);
       const y = d3.scaleLinear().domain([0, 0.1]).range([h, 0]);
-      g.append("g").call((s) => yGrid(s, y, w, 2, (v) => `${Math.round(v * 100)}%`));
+      g.append("g").call((s) => yGrid(s, y, w, 2, pctAxis));
       g.append("g").attr("transform", `translate(0,${h})`).attr("class", "axis")
-        .call(d3.axisBottom(x).tickFormat(label).tickSizeOuter(0)).call((s) => s.select(".domain").attr("stroke", "var(--axis)"));
+        .call(d3.axisBottom(x).tickFormat(label(x)).tickSizeOuter(0)).call((s) => s.select(".domain").attr("stroke", "var(--axis)"));
       columns(g, x, y, h, (d) => d[key], (v) => (v >= 0.005 ? pct(v, 0) : ""), null);
     });
   }

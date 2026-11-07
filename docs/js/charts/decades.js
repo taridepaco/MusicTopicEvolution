@@ -1,31 +1,24 @@
 // The most distinctive words of each decade (weighted log-odds), one decade per step.
 import { box, dur, hideTip, pct, showTip } from "../ui.js";
+import { cap, dec, decade, onLang, t } from "../i18n.js";
 const d3 = window.d3;
 
-const CAPTIONS = {
-  1940: "Violins, sighs and sweethearts: the language of crooners and big bands.",
-  1950: "Waltzes, thrills and kisses; dear and lonesome hearts.",
-  1960: "The Mashed Potato and the Twist, groovy and gee, and plenty of loneliness.",
-  1970: "The Lord, the blues, the gambler, the boogie and the morning after.",
-  1980: "Hearts, lovers, passion and romance, often far apart: the power-ballad decade.",
-  1990: "Rhymes and flow, funk and brothers, and cuz: hip-hop arrives in the charts.",
-  2000: "The club, shorties, chicks and holla: club rap and R&B.",
-  2010: "Explicit language goes mainstream, along with money and drinks.",
-  2020: "Opps, bros and whiskey: drill-inflected rap meets country.",
-};
-
+// one step per decade, rewritten in place when the language changes
 export function buildDecadeSteps(container, decades) {
+  const fills = [];
   for (const d of Object.keys(decades)) {
     const s = document.createElement("div");
     s.className = "step";
     s.dataset.step = d;
     const h = document.createElement("h3");
-    h.textContent = `${d}s`;
     const p = document.createElement("p");
-    p.textContent = CAPTIONS[d] || "";
     s.append(h, p);
     container.appendChild(s);
+    fills.push(() => { h.textContent = cap(decade(d)); p.textContent = t(`dec.caption.${d}`); });
   }
+  const fill = () => fills.forEach((f) => f());
+  fill();
+  onLang(fill);
 }
 
 export function decadesChart(el, data) {
@@ -34,14 +27,16 @@ export function decadesChart(el, data) {
   function render() {
     const { width, height } = box(el);
     const words = decades[current];
-    const m = { top: 40, right: 80, bottom: 26, left: 92 };
+    // the key ("bar: … · label: …") takes two lines on narrow screens
+    const sub = width < 560 ? t("dec.sub").split(" · ") : [t("dec.sub")];
+    const m = { top: 25 + 15 * sub.length, right: 80, bottom: 26, left: 92 };
     const w = width - m.left - m.right, h = Math.min(height - m.top - m.bottom, words.length * 40);
     const svg = d3.select(el).selectAll("svg").data([0]).join("svg").attr("viewBox", `0 0 ${width} ${height}`);
     svg.selectAll("*").remove();
-    svg.append("text").attr("class", "annotation annotation--strong").attr("x", m.left).attr("y", 18)
-      .text(`${current}s: most distinctive words`);
-    svg.append("text").attr("class", "annotation").attr("x", m.left).attr("y", 33)
-      .text("bar: how distinctive (z-score) · label: share of the decade's hits that use it");
+    const tx = sub.length > 1 ? 0 : m.left;
+    svg.append("text").attr("class", "annotation annotation--strong").attr("x", tx).attr("y", 18)
+      .text(t("dec.title", { decade: cap(decade(current)) }));
+    sub.forEach((line, k) => svg.append("text").attr("class", "annotation").attr("x", tx).attr("y", 33 + 15 * k).text(line));
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top + 8})`);
     const zmax = d3.max(Object.values(decades).flat(), (d) => d.z);
     const x = d3.scaleLinear().domain([0, zmax]).range([0, w]);
@@ -61,8 +56,8 @@ export function decadesChart(el, data) {
       .text((d) => pct(d.share));
     row.append("rect").attr("x", -m.left).attr("width", w + m.left + m.right).attr("height", bh).attr("fill", "transparent")
       .on("pointermove", (ev, d) => showTip(ev, d.word, [
-        { label: `of the ${current}s hits use it`, value: pct(d.share, 1) },
-        { label: "distinctiveness (z)", value: d.z.toFixed(1) }]))
+        { label: t("dec.tip.share", { decade: decade(current) }), value: pct(d.share, 1) },
+        { label: t("dec.tip.z"), value: dec(d.z, 1) }]))
       .on("pointerleave", hideTip);
   }
   return { render, update(step) { current = step; render(); } };
