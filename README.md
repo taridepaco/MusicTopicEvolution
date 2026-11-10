@@ -24,16 +24,22 @@ contains lyrics.
 - Song lists: Wikipedia's *Billboard Year-End Hot 100* pages ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)).
 - Lyrics, used for the analysis only: [LRCLIB](https://lrclib.net) and [lyrics.ovh](https://lyrics.ovh).
 - Embeddings: [sentence-transformers](https://www.sbert.net) (`all-mpnet-base-v2`).
-- Charts: [D3](https://d3js.org) and [Scrollama](https://github.com/russellsamora/scrollama). Their licences are in `docs/vendor/`.
+- Charts: [D3](https://d3js.org) and [Scrollama](https://github.com/russellsamora/scrollama). Their licences are in `web/vendor/`.
 
 ## Run it locally
 
-The site is static, with no build step and no external requests:
+The site is in `web/`. It is static, with no dependencies and no external requests:
 
 ```bash
-cd docs && python3 -m http.server 8000
+python3 -m http.server 8000 --directory web
 ```
 
 Then open http://localhost:8000.
+
+## Deploy
+
+`deploy/build.sh` builds `web/` into `dist/`, and that same `dist/` is published everywhere:
+GitHub Pages (by `.github/workflows/pages.yml`, with every push to `main`) and, if wanted, a server
+of your own (by `deploy/install.sh`). Details in [DEPLOY.md](DEPLOY.md).
 
 By [@taridepaco](https://github.com/taridepaco).
