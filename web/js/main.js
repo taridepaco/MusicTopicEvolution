@@ -12,7 +12,8 @@ import { buildDecadeSteps, decadesChart } from "./charts/decades.js";
 import { commonChart } from "./charts/common.js";
 import { songSearch } from "./charts/search.js";
 
-const load = (name) => fetch(`data/${name}.json`).then((r) => {
+// relative to this module, not to the page: the build moves everything but index.html to v/<hash>/
+const load = (name) => fetch(new URL(`../data/${name}.json`, import.meta.url)).then((r) => {
   if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
   return r.json();
 });
